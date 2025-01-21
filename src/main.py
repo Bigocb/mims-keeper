@@ -2,6 +2,7 @@ from flask import Flask, request
 from sqlalchemy.testing.plugin.plugin_base import logging
 
 from src.data import Data, Interaction
+from src.tagging import Tagging
 
 app = Flask(__name__)
 
@@ -12,11 +13,17 @@ def keep() -> str:
     # Get request body
     req_body: dict = request.get_json()
 
+    # Get tags for the given response
+    tags = Tagging()
+
     # Build our initial Interaction object
     keep_req = Interaction(
         prompt=req_body['prompt'],
-        response = req_body['response']
+        response = req_body['response'],
+        tags=tags.tag(req_body['response'])
     )
+
+    print(f"This is the completed req: {keep_req}")
 
     # Create connection and save our Interaction
     database = Data()
